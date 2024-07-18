@@ -3,6 +3,6 @@ module.exports = function isAuthenticated(req, res, next) {
       return next();
   }
   req.flash('error', 'Iltimos, tizimga kiring.');
-  res.redirect('/auth/login');
+  res.redirect('/');
 }
 
