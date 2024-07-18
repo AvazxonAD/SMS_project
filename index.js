@@ -8,18 +8,19 @@ const flash = require('connect-flash')
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
+const pool = require('./config/db')
 
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+// const pool = new Pool({
+//   connectionString: process.env.POSTGRES_URL,
+//   ssl: {
+//     rejectUnauthorized: false
+//   }
+// });
 
 app.use(session({
   store: new pgSession({
     pool: pool,
-    tableName: 'session'
+    tableName: 'sessions'
   }),
   secret: process.env.SECRET_KEY,
   resave: false,
@@ -37,8 +38,6 @@ app.use(flash())
 //Initialize template engine (handlebars)
 app.engine('.hbs', exphbs.engine({ extname: '.hbs' }))
 app.set('view engine', '.hbs')
-
-app.use(express.static(path.join(__dirname, 'public')))
 
 require('./utils/create.user')()
 

@@ -1,4 +1,6 @@
 const { Router } = require('express')
+const multer = require('multer')
+const upload = multer();
 const router = Router()
 const { 
   smsPage,
@@ -7,7 +9,6 @@ const {
 
 const protect = require('../middlewares/auth')
 
-const upload = require('../utils/fileUpload')
 
 router.get('/page', protect,  smsPage)
 router.post('/download', protect, upload.single('file'), smsDownload)
