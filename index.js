@@ -27,9 +27,9 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use(flash())
 
-//Initialize template engine (handlebars)
-app.engine('.hbs', exphbs.engine({ extname: '.hbs' }))
-app.set('view engine', '.hbs')
+app.engine('handlebars', exphbs.engine());
+app.set('view engine', 'handlebars');
+app.set('views', './views');
 
 require('./utils/create.user')()
 

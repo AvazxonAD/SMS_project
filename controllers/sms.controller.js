@@ -9,7 +9,7 @@ exports.smsPage =async  (req, res) => {
     try {
         req.session.islogged = true;
         await req.session.save();
-        return res.render('sms/index', {
+        return res.render(path.join(__dirname, '..', "/wiews/'sms/index'.handlebars"), {
             title: 'sms',
             errorMessage: req.flash('error'),
             message: req.flash('success'),

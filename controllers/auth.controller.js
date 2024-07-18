@@ -4,7 +4,7 @@ const path = require('path')
 // login 
 exports.getLoginPage = (req, res) => {
   try {
-    return res.render(path.join(__dirname, '..', "/wiews/auth/login.hbs"), {
+    return res.render(path.join(__dirname, '..', "/wiews/auth/login.handlebars"), {
       title: 'Login',
       errorMessage: req.flash('error')
     });
@@ -62,7 +62,7 @@ exports.updatePage = async (req, res) => {
     const userResult = await pool.query('SELECT * FROM users');
     const user = userResult.rows[0];
 
-    return res.render('auth/update', {
+    return res.render(path.join(__dirname, '..', "/wiews/auth/update.handlebars"), {
       title: 'Update',
       errorMessage: req.flash('error'),
       message: req.flash('success'),
