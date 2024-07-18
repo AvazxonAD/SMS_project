@@ -9,7 +9,7 @@ exports.smsPage =async  (req, res) => {
     try {
         req.session.islogged = true;
         await req.session.save();
-        return res.render("/index.handlebars", {
+        return res.render("index.handlebars", {
             title: 'sms',
             errorMessage: req.flash('error'),
             message: req.flash('success'),
