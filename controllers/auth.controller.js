@@ -20,7 +20,7 @@ exports.loginPost = async (req, res) => {
 
   if (!username || !password) {
     req.flash('error', "Istiqomat inputlar to'ldirilishi shart");
-    return res.redirect('/auth/login')
+    return res.redirect('/')
   }
 
   try {
@@ -28,21 +28,21 @@ exports.loginPost = async (req, res) => {
 
     if (userResult.rows.length === 0) {
       req.flash('error', "Username yoki parol xato");
-      return res.redirect("/auth/login")
+      return res.redirect("/")
     }
 
     const user = userResult.rows[0];
     const validPassword = await bcrypt.compare(password.trim(), user.password);
     if (!validPassword) {
       req.flash('error', "Username yoki parol xato");
-      return res.redirect('/auth/login')
+      return res.redirect('/')
     }
 
     return res.redirect('/sms/page');
   } catch (error) {
     console.error('Server xatosi:', error);
     req.flash('error', "Server xatosi yuz berdi");
-    return res.redirect('/auth/login')
+    return res.redirect('/')
   }
 }
 
@@ -50,7 +50,7 @@ exports.loginPost = async (req, res) => {
 exports.logout = async (req, res) => {
   req.session.islogged = false
   await req.session.save()
-  res.redirect('/auth/login')
+  res.redirect('/')
 }
 
 // Update page
@@ -72,7 +72,7 @@ exports.updatePage = async (req, res) => {
   } catch (error) {
     console.error('Server xatosi:', error);
     req.flash('error', 'Server xatosi yuz berdi');
-    return res.redirect('/auth/login');
+    return res.redirect('/');
   }
 };
 
