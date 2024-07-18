@@ -1,0 +1,55 @@
+<div class="container mt-5 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="row w-100">
+    <div class="col-md-6 offset-md-3">
+      <form action="/auth/update/post" method="post">
+        {{#if errorMessage}}
+        <div class="alert alert-danger" role="alert">
+          {{errorMessage}}
+        </div>
+        {{/if}}
+        {{#if message}}
+        <div class="alert alert-primary" role="alert">
+          {{message}}
+        </div>
+        {{/if}}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" name="username" id="username" value="{{username}}">
+        </div>
+        <div class="mb-3">
+          <label for="oldPassword" class="form-label">Old Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" name="oldPassword" id="oldPassword">
+            <button type="button" class="btn btn-outline-secondary" id="toggleOldPassword">
+              Show
+            </button>
+          </div>
+          <label for="newPassword" class="form-label">New Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" name="newPassword" id="newPassword">
+            <button type="button" class="btn btn-outline-secondary" id="toggleNewPassword">
+              Show
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('toggleOldPassword').addEventListener('click', function () {
+    const passwordField = document.getElementById('oldPassword');
+    const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordField.setAttribute('type', passwordFieldType);
+    this.textContent = passwordFieldType === 'password' ? 'Show' : 'Hide';
+  });
+
+  document.getElementById('toggleNewPassword').addEventListener('click', function () {
+    const passwordField = document.getElementById('newPassword');
+    const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordField.setAttribute('type', passwordFieldType);
+    this.textContent = passwordFieldType === 'password' ? 'Show' : 'Hide';
+  });
+</script>

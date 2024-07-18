@@ -1,0 +1,36 @@
+<div class="container mt-5 d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="row w-100">
+    <div class="col-md-6 offset-md-3">
+      <form action="/auth/login/post" method="post">
+        {{#if errorMessage }}
+        <div class="alert alert-danger" role="alert">
+          {{ errorMessage }}
+        </div>
+        {{/if}}
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" name="username" id="username">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" class="form-control" name="password" id="password">
+            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+              Show
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('togglePassword').addEventListener('click', function () {
+    const passwordField = document.getElementById('password');
+    const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordField.setAttribute('type', passwordFieldType);
+    this.textContent = passwordFieldType === 'password' ? 'Show' : 'Hide';
+  });
+</script>
