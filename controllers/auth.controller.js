@@ -83,7 +83,7 @@ exports.updatePost = async (req, res) => {
   const { username, oldPassword, newPassword } = req.body
   if (!username || !oldPassword || !newPassword) {
     req.flash('error', "Sorovlar bosh qolishi mumkin emas")
-    return res.redirect('/auth/update')
+    return res.redirect('/update')
   }
 
   const userResult = await pool.query('SELECT * FROM users');
@@ -93,11 +93,11 @@ exports.updatePost = async (req, res) => {
 
   if (!validPassword) {
     req.flash('error', "Parol xato");
-    return res.redirect('/auth/update')
+    return res.redirect('/update')
   }
 
   await pool.query(`UPDATE users SET username = $1, password = $2`, [username, await bcrypt.hash(newPassword, 10)])
   req.flash('success', "Muvaffiqiyatli yangilandi")
-  return res.redirect("/auth/update")
+  return res.redirect("/update")
 
 }
