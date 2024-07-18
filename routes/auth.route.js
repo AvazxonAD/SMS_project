@@ -10,7 +10,7 @@ const {
 
 const protect = require('../middlewares/auth')
 
-router.get('/login', getLoginPage)
+router.get('/', getLoginPage)
 router.post('/login/post', loginPost)
 router.get('/logout', logout)
 router.get("/update", protect, updatePage)

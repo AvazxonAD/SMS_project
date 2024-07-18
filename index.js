@@ -40,7 +40,7 @@ app.set('views', path.join(__dirname, 'views')); // Ensure correct path resoluti
 
 require('./utils/create.user')()
 
-app.use('/auth', require('./routes/auth.route'))
+app.use('/', require('./routes/auth.route'))
 app.use('/sms', require('./routes/sms.route'))
 
 
