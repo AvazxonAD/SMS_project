@@ -1,10 +1,10 @@
 const pool = require('../config/db');
 const bcrypt = require('bcrypt')
-
+const path = require('path')
 // login 
 exports.getLoginPage = (req, res) => {
   try {
-    return res.render('auth/login', {
+    return res.render(path.join(__dirname, '..', "/wiews/auth/login.hbs"), {
       title: 'Login',
       errorMessage: req.flash('error')
     });
