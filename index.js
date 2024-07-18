@@ -6,15 +6,8 @@ const exphbs = require('express-handlebars')
 const path = require('path')
 const flash = require('connect-flash')
 const session = require('express-session');
+const pool = require('./config/db')
 const pgSession = require('connect-pg-simple')(session);
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
 
 app.use(session({
   store: new pgSession({
