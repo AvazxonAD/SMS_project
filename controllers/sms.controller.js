@@ -73,7 +73,7 @@ exports.smsDownload = async (req, res) => {
             const forSms = {
                 mobile_phone: `998${rowData.phone}`,
                 message: `${rowData.message}`,
-                from: "4546"
+                from: "998992996937"
             };
             const response = await axios.post(api, forSms, headers);
         }
