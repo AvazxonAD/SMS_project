@@ -12,7 +12,7 @@ exports.create = asyncHandler(async (req, res, next) => {
         const regex = /^[1-9]\d{8}$/
         const phoneTest = regex.test(client.phone.trim())
         if (!phoneTest) {
-            return next(new ErrorResponse(`Telefon raqami notog'ri kiritildi : ${client.phone}`, 400))
+            return next(new ErrorResponse(`Telefon raqami notog'ri kiritildi : ${client.phone}. Tog'ri format : 992996937`, 400))
         }
 
         const mijoz = await pool.query(`SELECT * FROM clients WHERE username ILIKE $1 AND phone = $2`, [`${client.lastname.trim()} ${client.firstname.trim()}`, client.phone.trim()])
@@ -39,10 +39,10 @@ exports.getAllClients = asyncHandler(async (req, res, next) => {
             SELECT * 
             FROM clients
             ORDER BY username 
-            OFFSET $2
-            LIMIT $3
-        `, [req.params.id, (page - 1) * limit, limit])
-    const total = await pool.query(`SELECT COUNT(id) AS total FROM clinets`, [req.params.id])
+            OFFSET $1
+            LIMIT $2
+        `, [(page - 1) * limit, limit])
+    const total = await pool.query(`SELECT COUNT(id) AS total FROM clients`)
 
     return res.status(200).json({
         success: true,
@@ -58,15 +58,56 @@ exports.getAllClients = asyncHandler(async (req, res, next) => {
 
 // update 
 exports.update = asyncHandler(async (req, res, next) => {
+    const {lastname, firstname, phone} = req.body
+    if(!lastname || !firstname || !phone){
+        return next(new ErrorResponse("So'rovlar bo'sh qolishi mumkin emas", 400))
+    }
+    const regex = /^[1-9]\d{8}$/
+    const phoneTest = regex.test(phone.trim())
+    if (!phoneTest) {
+        return next(new ErrorResponse(`Telefon raqami notog'ri kiritildi : ${phone}. Tog'ri format : 992996937`, 400))
+    }
 
+    let client = await pool.query(`SELECT * FROM clients WHERE id = $1`, [req.params.id])
+    client = client.rows[0]
+    if(client.username !== `${lastname.trim()} ${firstname.trim()}` && client.phhone !== phone.trim()){
+        const mijoz = await pool.query(`SELECT * FROM clients WHERE username ILIKE $1 AND phone = $2`, [`${lastname.trim()} ${firstname.trim()}`, phone.trim()])
+        if (mijoz.rows[0]) {
+            return next(new ErrorResponse(`Ushbu mijoz avval kiritilgan : ${lastname} ${firstname}. Telefon raqami : +998${phone}`))
+        }
+    }
+    const updateClient = await pool.query(`UPDATE clients SET username = $1, phone = $2 WHERE id = $3 RETURNING *
+    `, [`${lastname.trim()} ${firstname.trim()}`, phone, req.params.id])
+    
+    return res.status(200).json({
+        success: true,
+        data: updateClient.rows[0]
+    })
 })
 
 // delete 
 exports.deleteClient = asyncHandler(async (req, res, next) => {
-
+    let client = await pool.query(`DELETE FROM clients WHERE id = $1 RETURNING *`, [req.params.id])
+    client = client.rows[0]
+    if(!client){
+        return next(new ErrorResponse('server xatolik', 500))
+    }
+    return res.status(200).json({
+        success: true, 
+        data: client
+    })
 })
 
 // get elemnt by id 
 exports.getelementByid = asyncHandler(async (req, res, next) => {
+    let client = await pool.query(`SELECT * FROM clients WHERE id = $1`, [req.params.id])
+    client = client.rows[0]
+    if(!client){
+        return next(new ErrorResponse("server xatolik", 404))
+    }
 
+    res.status(200).json({
+        success: true,
+        data: client
+    })
 })
