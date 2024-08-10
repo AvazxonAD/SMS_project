@@ -1,19 +1,17 @@
 const { Router } = require('express')
 const router = Router()
+
 const { 
-  getLoginPage,
-  loginPost,
-  logout,
-  updatePage,
-  updatePost
+    login,
+    getProfile,
+    update
 } = require('../controllers/auth.controller')
 
 const protect = require('../middlewares/auth')
 
-router.get('/', getLoginPage)
-router.post('/login/post', loginPost)
-router.get('/logout', logout)
-router.get("/update", protect, updatePage)
-router.post('/update/post', protect, updatePost )
+
+router.post('/login', login)
+router.get('/get', protect, getProfile)
+router.put('/update', protect, update)
 
 module.exports = router
