@@ -13,6 +13,8 @@ app.use(express.urlencoded({extended: false}))
 
 
 app.use('/auth', require('./routes/auth.route'))
+app.use('/client', require('./routes/client.router'))
+
 
 app.use(require('./middlewares/errorHandler'))
 

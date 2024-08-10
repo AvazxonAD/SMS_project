@@ -5,6 +5,7 @@ CREATE TABLE users(
 );
 
 CREATE TABLE clients(
+    id BIGSERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
     phone VARCHAR(9) NOT NULL 
 )
