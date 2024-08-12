@@ -29,7 +29,7 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
     for (let client of clients) {
         let clientBaza = await pool.query(`SELECT * FROM clients WHERE id = $1`, [client.id]);
         clientBaza = clientBaza.rows[0];
-        const sendMessage = `Navoiy viloyati Milliy Gvardiya qo'riqlash boshqarmasi nomidan. Hurmatli ${clientBaza.username}. Sizda xonadon qong'irog'i bo'yicha ${returnSumma(client.summa)} so'm qarzdorlik bor. To'lovni Paymi, Uzum bank, Click ilovalari orqali to'lashingiz mumkin.Aloqa telefonlari: 939539444, 934632828.`;
+        const sendMessage = `Hurmatli ${clientBaza.username}  Navoiy viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin. Aloqa telefonlari: +998930883434 +998939539444`;
         const utime = Math.floor(Date.now() / 1000); 
         const accessToken = generateTransmitAccessToken('qorakolqch', process.env.SECRETKEY, utime)
         const data = {
@@ -55,8 +55,6 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
             responseData.push({
                 username: clientBaza.username, 
                 phone: clientBaza.phone,
-                message: sendMessage,
-                date: returnLocalDate(new Date()),
                 success: true
             })
             await pool.query(
@@ -69,8 +67,6 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
             responseData.push({
                 username: clientBaza.username, 
                 phone: clientBaza.phone,
-                message: sendMessage,
-                date: returnLocalDate(new Date()),
                 success: false
             })
         }
@@ -80,3 +76,89 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
         data: responseData
     });
 });
+
+// import excel data 
+exports.importExcelData = asyncHandler(async (req, res, next) => {
+    if (!req.file) {
+        return next(new ErrorResponse("Fayl yuklanmadi", 400));
+    }
+
+    const fileBuffer = req.file.buffer;
+    const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data = xlsx.utils.sheet_to_json(sheet).map(row => {
+        const newRow = {};
+        for (const key in row) {
+            newRow[key.trim()] = row[key];
+        }
+        return newRow;
+    });
+    for (const rowData of data) {
+        if(!rowData.username || !rowData.phone){
+            return next(new ErrorResponse('sorovlar bosh qolishi mumkin emas', 400))
+        }
+        if(!rowData.id || typeof rowData.id !== 'number'){
+            return next(new ErrorResponse(`id bosh  bolishi  mumkin emas yoki numberdan boshqa tip bolishi mumkin emas. Xato sababchisi : ${rowData.id}`, 400))
+        }
+        if(!rowData.summa || !Number.isInteger(rowData.summa)){
+            return next(new ErrorResponse(`summa bosh  bolishi  mumkin emas yoki numberdan boshqa tip bolishi mumkin emas. Xato sababchisi : ${rowData.summa}`, 400))
+        }
+        const mijoz = await pool.query(`SELECT * FROM clients WHERE id = $1`, [rowData.id])
+        if (!mijoz.rows[0]) {
+            return next(new ErrorResponse(`Mijoz topilmadi : ${rowData.username}. Telefon raqami : +998${rowData.phone}. ID raqami notog'ri : ${rowData.id}`))
+        }
+    }
+
+    const responseData = []
+    // SMS API
+    for (let client of data) {
+        let clientBaza = await pool.query(`SELECT * FROM clients WHERE id = $1`, [client.id]);
+        clientBaza = clientBaza.rows[0];
+        const sendMessage = `Hurmatli ${clientBaza.username}  Navoiy viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin. Aloqa telefonlari: +998930883434 +998939539444`;
+        const utime = Math.floor(Date.now() / 1000); 
+        const accessToken = generateTransmitAccessToken('qorakolqch', process.env.SECRETKEY, utime)
+        const data = {
+            utime, 
+            username: 'qorakolqch',
+            service: {
+                service: 1  
+            },
+            message: {
+                smsid: uuid.v4(), 
+                phone: `998${clientBaza.phone}`,       
+                text: sendMessage
+            }
+        };
+        const response = await axios.post('https://routee.sayqal.uz/sms/TransmitSMS', data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Token': accessToken 
+            }
+        })
+
+        if(response.status === 200){
+            responseData.push({
+                username: clientBaza.username, 
+                phone: clientBaza.phone,
+                success: true
+            })
+            await pool.query(
+                `INSERT INTO reports (client_id, report, senddate) VALUES ($1, $2, $3)`,
+                [client.id, sendMessage, new Date()]
+            );
+        }
+
+        if(response.status !== 200){
+            responseData.push({
+                username: clientBaza.username, 
+                phone: clientBaza.phone,
+                success: false
+            })
+        }
+    }
+    return res.status(200).json({
+        success: true,
+        data: responseData
+    });
+})

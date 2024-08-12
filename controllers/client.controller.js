@@ -198,12 +198,13 @@ exports.importExcel = asyncHandler(async (req, res, next) => {
 exports.exportExcel = asyncHandler(async (req, res, next) => {
     const clients = await pool.query(`SELECT * FROM clients ORDER BY username`)
     const worksheetData = clients.rows.map(data => ({
-        'Mijoz': data.username,
+        'id': data.id,
+        'username': data.username,
         'phone': data.phone
     }));
 
     const worksheet = xlsx.utils.json_to_sheet(worksheetData);
-    worksheet['!cols'] = [{ width: 80 }, { width: 30 }];
+    worksheet['!cols'] = [{ width: 10 }, { width: 80 }, { width: 30 }];
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Mijozlar');
 

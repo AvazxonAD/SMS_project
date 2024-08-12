@@ -2,7 +2,6 @@ const ErrorResponse = require('../utils/errorResponse')
 const pool = require('../config/db')
 const asyncHandler = require('../middlewares/asyncHandler')
 const generateToken = require('../utils/ganerate.token')
-const bcrypt = require('bcrypt')
 
 // login 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -19,7 +18,7 @@ exports.login = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse("Username yoki parol xato kiritildi", 403));
     }
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = password === user.password
     if (!match) {
         return next(new ErrorResponse("Username yoki parol xato kiritildi", 403));
     }
@@ -52,11 +51,11 @@ exports.update = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse("sorovlar bo'sh qolmasligi kerak", 400))
     }
 
-    const match = await bcrypt.compare(oldPassword, user.password);
+    const match = password === user.password
     if (!match) {
         return next(new ErrorResponse("Username yoki parol xato kiritildi", 403));
     }
-    const updateUser = await pool.query(`UPDATE users SET username = $1, password = $2 RETURNING *`, [username, await bcrypt.hash(newPassword, 10)])
+    const updateUser = await pool.query(`UPDATE users SET username = $1, password = $2 RETURNING *`, [username, newPassword])
     return res.status(200).json({
         success: true, 
         data: updateUser.rows[0]
