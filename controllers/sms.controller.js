@@ -5,7 +5,7 @@ const axios = require('axios')
 const returnSumma = require('../utils/returnSumma')
 const uuid = require('uuid')
 const generateTransmitAccessToken = require('../utils/access');
-const { returnLocalDate } = require("../utils/date.functions");
+const xlsx = require('xlsx')
 
 // to send sms 
 exports.sendSms = asyncHandler(async (req, res, next) => {
@@ -98,7 +98,7 @@ exports.importExcelData = asyncHandler(async (req, res, next) => {
         if(!rowData.username || !rowData.phone){
             return next(new ErrorResponse('sorovlar bosh qolishi mumkin emas', 400))
         }
-        if(!rowData.id || typeof rowData.id !== 'number'){
+        if(!rowData.id){
             return next(new ErrorResponse(`id bosh  bolishi  mumkin emas yoki numberdan boshqa tip bolishi mumkin emas. Xato sababchisi : ${rowData.id}`, 400))
         }
         if(!rowData.summa || !Number.isInteger(rowData.summa)){
