@@ -170,15 +170,15 @@ exports.importExcel = asyncHandler(async (req, res, next) => {
         if (!rowData.username) {
             return next(new ErrorResponse(`FIO bo'sh qolishi mumkin emas. Excel faylni tekshiring`, 400));
         }
-        if (typeof rowData.username !== "string" || typeof rowData.phone !== "string") {
+        if (typeof rowData.username !== "string") {
             return next(new ErrorResponse(`Ma'lumotlar matn formatida bo'lishi kerak. Excel ustunini tekshiring`, 400));
         }
         const regex = /^[1-9]\d{8}$/
-        const phoneTest = regex.test(rowData.phone.trim())
+        const phoneTest = regex.test(rowData.phone.toString().trim())
         if (!phoneTest) {
             return next(new ErrorResponse(`Telefon raqami notog'ri kiritildi : ${rowData.phone}. Tog'ri format : 992996937`, 400))
         }
-        const mijoz = await pool.query(`SELECT * FROM clients WHERE username ILIKE $1 AND phone = $2`, [rowData.username.trim(), rowData.phone.trim()])
+        const mijoz = await pool.query(`SELECT * FROM clients WHERE username ILIKE $1 AND phone = $2`, [rowData.username.trim(), rowData.phone.toString().trim()])
         if (mijoz.rows[0]) {
             return next(new ErrorResponse(`Ushbu mijoz avval kiritilgan : ${rowData.username}. Telefon raqami : +998${rowData.phone}`))
         }
