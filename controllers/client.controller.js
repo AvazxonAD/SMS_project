@@ -167,7 +167,7 @@ exports.importExcel = asyncHandler(async (req, res, next) => {
         return newRow;
     });
     for (const rowData of data) {
-        if (!rowData.username) {
+        if (!rowData.username || !rowData.phone) {
             return next(new ErrorResponse(`FIO bo'sh qolishi mumkin emas. Excel faylni tekshiring`, 400));
         }
         if (typeof rowData.username !== "string") {
