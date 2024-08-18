@@ -18,7 +18,7 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
         if (!Number.isInteger(client.summa)) {
             return next(new ErrorResponse(`Summa noto'g'ri kiritildi: ${client.summa}`, 400));
         }
-        const test = await pool.query(`SELECT * FROM clients WHERE id = $1`, [client.id]);
+        const test = await pool.query(`SELECT * FROM clients WHERE id = $1 AND user_id = $2`, [client.id, req.user.id]);
         if (!test.rows[0]) {
             return next(new ErrorResponse(`Server xatolik`, 500));
         }
@@ -27,7 +27,7 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
     const responseData = []
     // SMS API
     for (let client of clients) {
-        let clientBaza = await pool.query(`SELECT * FROM clients WHERE id = $1`, [client.id]);
+        let clientBaza = await pool.query(`SELECT * FROM clients WHERE id = $1 AND user_id = $2`, [client.id, req.user.id]);
         clientBaza = clientBaza.rows[0];
         const sendMessage = `Hurmatli ${clientBaza.username}  Navoiy viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin. Aloqa telefonlari: +998930883434 +998939539444`;
         const utime = Math.floor(Date.now() / 1000); 
@@ -58,8 +58,8 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
                 success: true
             })
             await pool.query(
-                `INSERT INTO reports (client_id, report, senddate) VALUES ($1, $2, $3)`,
-                [client.id, sendMessage, new Date()]
+                `INSERT INTO reports (client_id, report, senddate, user_id) VALUES ($1, $2, $3, $4)`,
+                [client.id, sendMessage, new Date(), req.user.id]
             );
         }
 

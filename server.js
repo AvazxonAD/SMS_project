@@ -17,6 +17,7 @@ app.use('/auth', require('./routes/auth.route'))
 app.use('/client', require('./routes/client.router'))
 app.use('/sms', require('./routes/sms.route'))
 app.use('/report', require('./routes/report.router'))
+app.use('/region', require('./routes/region.router'))
 
 app.use(require('./middlewares/errorHandler'))
 
