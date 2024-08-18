@@ -21,7 +21,7 @@ CREATE TABLE clients(
 CREATE TABLE reports(
     id BIGSERIAL PRIMARY KEY,
     client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
-    report VARCHAR(200) NOT NULL,
+    report VARCHAR(500) NOT NULL,
     senddate DATE NOT NULL,
     user_id INTEGER REFERENCES users(id) NOT NULL
 );

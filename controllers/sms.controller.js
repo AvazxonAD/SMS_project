@@ -101,10 +101,11 @@ exports.importExcelData = asyncHandler(async (req, res, next) => {
         if(!rowData.id){
             return next(new ErrorResponse(`id bosh  bolishi  mumkin emas yoki numberdan boshqa tip bolishi mumkin emas. Xato sababchisi : ${rowData.id}`, 400))
         }
-        if(!rowData.summa ){
+        if(!rowData.summa || typeof rowData.summa !== "number"){
             return next(new ErrorResponse(`summa bosh  bolishi  mumkin emas yoki numberdan boshqa tip bolishi mumkin emas. Xato sababchisi ID raqami: ${rowData.id}`, 400))
         }
-        const mijoz = await pool.query(`SELECT * FROM clients WHERE id = $1 AND username = $2 AND phone = $3`, [rowData.id, rowData.username, rowData.phone])
+        const mijoz = await pool.query(`SELECT * FROM clients WHERE id = $1 AND username = $2 AND phone = $3 AND user_id = $4
+            `, [rowData.id, rowData.username, rowData.phone, req.user.id])
         if (!mijoz.rows[0]) {
             return next(new ErrorResponse(`Mijoz topilmadi : ${rowData.username}. Telefon raqami : +998${rowData.phone}. ID raqami : ${rowData.id}`))
         }
