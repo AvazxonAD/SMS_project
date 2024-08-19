@@ -8,7 +8,10 @@ const {
 
 // get all dates 
 exports.getAllDates = asyncHandler(async (req, res, next) => {
-    const dates = await pool.query(`SELECT DISTINCT(senddate) FROM reports ORDER BY senddate`)
+    if(!req.user){
+      return next(new ErrorResponse('Unable to enter', 403))
+    }
+    const dates = await pool.query(`SELECT DISTINCT(senddate) FROM reports WHERE user_id = $1 ORDER BY senddate`, [req.user.id])
     const result = dates.rows.map(date => {
       return returnLocalDate(date.senddate)
     })
@@ -25,8 +28,8 @@ exports.getAllSmses = asyncHandler(async (req, res, next) => {
             clients.username, clients.phone
      FROM reports
      JOIN clients ON reports.client_id = clients.id
-     WHERE reports.senddate = $1`,
-    [returnDate(req.query.date)]
+     WHERE reports.senddate = $1 AND user_id = $2`,
+    [returnDate(req.query.date), req.user.id]
   );
 
   const result = smses.rows.map(report => {

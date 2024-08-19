@@ -18,6 +18,7 @@ app.use('/client', require('./routes/client.router'))
 app.use('/sms', require('./routes/sms.route'))
 app.use('/report', require('./routes/report.router'))
 app.use('/region', require('./routes/region.router'))
+app.use('/xorazm', require('./routes/sms.xorazm.router.js'))
 
 app.use(require('./middlewares/errorHandler'))
 
