@@ -115,11 +115,9 @@ exports.getAllSmses = asyncHandler(async (req, res, next) => {
     }
 
   const smses = await pool.query(
-    `SELECT reports.id, reports.client_id, reports.report, reports.senddate,
-            clients.username, clients.phone
+    `SELECT id, report, senddate, user_id
      FROM reports
-     JOIN clients ON reports.client_id = clients.id
-     WHERE reports.senddate = $1 AND reports.user_id = $2`,
+     WHERE senddate = $1 AND user_id = $2`,
     [returnDate(req.query.date), user.id]
   );
 
