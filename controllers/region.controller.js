@@ -4,7 +4,6 @@ const ErrorResponse = require('../utils/errorResponse');
 
 // Create (yangi yozuv qo'shish)
 exports.createRegion = asyncHandler(async (req, res, next) => {
-    console.log(req.user)
     const { name } = req.body;
     if(!name || typeof name !== "string"){
         return next(new ErrorResponse('sorovlar bosh qolishi mumkin emas', 400))
