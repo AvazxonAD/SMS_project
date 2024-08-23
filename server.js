@@ -7,9 +7,7 @@ require('dotenv').config();
 require('colors')
 require('./utils/create.user')();
 
-app.use(cors({
-    origin: 'https://sms-project-nine.vercel.app'
-}));
+app.use(cors())
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
