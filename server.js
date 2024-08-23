@@ -7,11 +7,8 @@ require('dotenv').config();
 require('colors')
 require('./utils/create.user')();
   
-const corsOptions = {
-  origin: ['http://147.45.107.174:3001', 'http://192.168.83.5:3001' ]
-};
 
-app.use(cors(corsOptions));
+app.use(cors());
   
 
 app.use(express.json())
