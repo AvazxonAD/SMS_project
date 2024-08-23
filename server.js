@@ -7,7 +7,9 @@ require('dotenv').config();
 require('colors')
 require('./utils/create.user')();
   
-  app.use(cors());
+  app.use(cors({
+    origin: 'https://147.45.107.174:3001'
+  }));
   
   
 
