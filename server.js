@@ -8,9 +8,7 @@ require('colors')
 require('./utils/create.user')();
   
 const corsOptions = {
-  origin: 'http://147.45.107.174:3001', // Kiritilgan domenni ruxsat eting
-  methods: ['GET', 'POST'], // POST so'rovini ruxsat eting
-  allowedHeaders: ['Content-Type', 'Authorization'] // Talab qilinadigan headerlarni ruxsat eting
+  origin: ['http://147.45.107.174:3001', 'http://192.168.83.5:3001' ]
 };
 
 app.use(cors(corsOptions));
