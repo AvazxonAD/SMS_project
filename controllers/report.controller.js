@@ -28,7 +28,7 @@ exports.getAllSmses = asyncHandler(async (req, res, next) => {
             clients.username, clients.phone
      FROM reports
      JOIN clients ON reports.client_id = clients.id
-     WHERE reports.senddate = $1 AND user_id = $2`,
+     WHERE reports.senddate = $1 AND clients.user_id = $2`,
     [returnDate(req.query.date), req.user.id]
   );
 
