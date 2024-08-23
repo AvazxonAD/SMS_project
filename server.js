@@ -6,15 +6,8 @@ require('dotenv').config();
 
 require('colors')
 require('./utils/create.user')();
-
-const corsOptions = {
-    origin: 'https://sms-project-nine.vercel.app', // Bu yerni aniq domen bilan almashtiring
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  };
   
-  app.use(cors(corsOptions));
+  app.use(cors());
   
   
 
