@@ -7,8 +7,13 @@ require('dotenv').config();
 require('colors')
 require('./utils/create.user')();
   
-  app.use(cors());
-  
+const corsOptions = {
+  origin: 'http://147.45.107.174:3001', // Kiritilgan domenni ruxsat eting
+  methods: ['GET', 'POST'], // POST so'rovini ruxsat eting
+  allowedHeaders: ['Content-Type', 'Authorization'] // Talab qilinadigan headerlarni ruxsat eting
+};
+
+app.use(cors(corsOptions));
   
 
 app.use(express.json())
