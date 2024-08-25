@@ -11,7 +11,7 @@ exports.getAllDates = asyncHandler(async (req, res, next) => {
     if(!req.user){
       return next(new ErrorResponse('Unable to enter', 403))
     }
-    const dates = await pool.query(`SELECT DISTINCT(senddate) FROM reports WHERE user_id = $1 ORDER BY senddate`, [req.user.id])
+    const dates = await pool.query(`SELECT DISTINCT(senddate) FROM reports WHERE user_id = $1 ORDER BY senddate DESC`, [req.user.id])
     const result = dates.rows.map(date => {
       return returnLocalDate(date.senddate)
     })
