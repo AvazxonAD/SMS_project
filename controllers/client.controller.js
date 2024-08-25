@@ -7,7 +7,7 @@ const xlsx = require('xlsx')
 exports.create = asyncHandler(async (req, res, next) => {
     const { clients } = req.body
     const id = req.params.id
-    if(!clients){
+    if(!clients || clients.length === 0 ){
         return next(new ErrorResponse("sorovlar bosh qolmasligi kerak", 400))
     }
     
