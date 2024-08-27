@@ -190,7 +190,7 @@ exports.searchOneRegion = asyncHandler(async (req, res, next) => {
 
 // for checked 
 exports.forchecked = asyncHandler(async (req, res, next) => {
-    const clients = await pool.query(`SELECT clients.id, clients.username, clients.phone, clients.region_id, regions.name 
+    const clients = await pool.query(`SELECT clients.id, clients.username, clients.phone, clients.region_id, regions.name AS region_name 
         FROM clients
         JOIN regions ON regions.id = clients.region_id
         WHERE clients.user_id = $1
