@@ -233,7 +233,7 @@ exports.importExcel = asyncHandler(async (req, res, next) => {
         if (!phoneTest) {
             return next(new ErrorResponse(`Telefon raqami notog'ri kiritildi : ${rowData.phone}. Tog'ri format : 992996937`, 400))
         }
-        const region = await pool.query(`SELECT * FROM regions WHERE id = $1`, [rowData.region_id])
+        const region = await pool.query(`SELECT * FROM regions WHERE id = $1 AND user_id = $2`, [rowData.region_id, req.user.id])
         if(!region.rows[0]){
             return next(new ErrorResponse("server xatolik viloyat topilmadi", 404))
         }
@@ -245,8 +245,11 @@ exports.importExcel = asyncHandler(async (req, res, next) => {
     }
 
     for (let client of data) {
-        await pool.query(`INSERT INTO clients(username, phone, region_id, user_id) VALUES($1, $2, $3, $4)
-            `, [client.username, client.phone, client.region_id, req.user.id])
+        const result = await pool.query(`INSERT INTO clients(username, phone, region_id, user_id) VALUES($1, $2, $3, $4)
+        `, [client.username, client.phone, client.region_id, req.user.id])
+        if(!result.rows[0]){
+            return next(new ErrorResponse('Server xatolik client kiritilmadi', 500))
+        }
     }
 
     return res.status(201).json({
