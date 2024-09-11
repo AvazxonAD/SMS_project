@@ -25,21 +25,21 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
     }
 
     const responseData = []
-    // SMS API
-    let region_name = ''
-    if(req.user.id === 1){
-        region_name = 'Navoiy'
+
+    const regionNames = {
+        1: 'Navoiy',
+        2: 'Surxondaryo',
+        3: 'test'
+    };
+    const regionName = regionNames[req.user.id];
+    if(!regionName){
+        return next(new ErrorResponse('Server xatolik region topilmadi', 500))
     }
-    if(req.user.id === 2){
-        region_name = 'Surxondaryo'
-    }
-    if(req.user.id === 3){
-        region_name = 'test'
-    }
+
     for (let client of clients) {
         let clientBaza = await pool.query(`SELECT * FROM clients WHERE id = $1 AND user_id = $2`, [client.id, req.user.id]);
         clientBaza = clientBaza.rows[0];
-        const sendMessage = `Hurmatli ${clientBaza.username} ${region_name} viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin.`;
+        const sendMessage = `Hurmatli ${clientBaza.username} ${regionName} viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin.`;
         const utime = Math.floor(Date.now() / 1000); 
         const accessToken = generateTransmitAccessToken('qorakolqch', process.env.SECRETKEY, utime)
         const data = {
@@ -126,3 +126,4 @@ exports.importExcelData = asyncHandler(async (req, res, next) => {
         data: data
     });
 })
+
