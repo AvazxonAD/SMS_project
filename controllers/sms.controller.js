@@ -68,8 +68,8 @@ exports.sendSms = asyncHandler(async (req, res, next) => {
                 success: true
             })
             await pool.query(
-                `INSERT INTO reports (client_id, report, senddate, user_id) VALUES ($1, $2, $3, $4)`,
-                [client.id, sendMessage, new Date(), req.user.id]
+                `INSERT INTO reports (client_fio, client_phone, report, senddate, user_id) VALUES ($1, $2, $3, $4, $5)`,
+                [clientBaza.username, clientBaza.phone, sendMessage, new Date(), req.user.id]
             );
         }
 
