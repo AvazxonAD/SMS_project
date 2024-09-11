@@ -24,11 +24,9 @@ exports.getAllDates = asyncHandler(async (req, res, next) => {
 // get all reports 
 exports.getAllSmses = asyncHandler(async (req, res, next) => {
   const smses = await pool.query(
-    `SELECT reports.id, reports.client_id, reports.report, reports.senddate,
-            clients.username, clients.phone
-     FROM reports
-     JOIN clients ON reports.client_id = clients.id
-     WHERE reports.senddate = $1 AND clients.user_id = $2`,
+    `SELECT id, report, client_fio AS username, senddate, client_phone AS phone
+    FROM reports
+     WHERE senddate = $1 AND user_id = $2`,
     [returnDate(req.query.date), req.user.id]
   );
 

@@ -127,3 +127,90 @@ exports.importExcelData = asyncHandler(async (req, res, next) => {
     });
 })
 
+// send sms comfortable
+exports.send_sms_comfortable = asyncHandler(async (req, res, next) => {
+    if (!req.file) {
+        return next(new ErrorResponse("Fayl yuklanmadi", 400));
+    }
+
+    const fileBuffer = req.file.buffer;
+    const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const clients = xlsx.utils.sheet_to_json(sheet).map(row => {
+        const newRow = {};
+        for (const key in row) {
+            newRow[key.trim()] = row[key];
+        }
+        return newRow;
+    });
+
+    for (let client of clients) {
+        if (!client.fio || !client.summa || !client.phone) {
+            return next(new ErrorResponse(`So'rovlar bo'sh qolishi mumkin emas`, 400));
+        }
+        if (!Number.isInteger(client.summa)) {
+            return next(new ErrorResponse(`Summa noto'g'ri kiritildi: ${client.summa}`, 400));
+        }
+    }
+
+    const responseData = []
+
+    const regionNames = {
+        1: 'Navoiy',
+        2: 'Surxondaryo',
+        3: 'test'
+    };
+    const regionName = regionNames[req.user.id];
+    if(!regionName){
+        return next(new ErrorResponse('Server xatolik region topilmadi', 500))
+    }
+
+    for (let client of clients) {
+        const sendMessage = `Hurmatli ${client.fio} ${regionName} viloyati Milliy gvardiyasi Qo'riqlash boshqarmasi sizga Qo'riqlash hizmati bo'yicha ${returnSumma(client.summa)} so'm qarzingiz mavjudligini eslatib o'tamiz. To'lovlarni Payme, Uzum bank, Click ilovalari orqali amalga oshirishingiz mumkin.`;
+        const utime = Math.floor(Date.now() / 1000); 
+        const accessToken = generateTransmitAccessToken('qorakolqch', process.env.SECRETKEY, utime)
+        const data = {
+            utime, 
+            username: 'qorakolqch',
+            service: {
+                service: 1  
+            },
+            message: {
+                smsid: uuid.v4(), 
+                phone: `998${client.phone}`,       
+                text: sendMessage
+            }
+        };
+        const response = await axios.post('https://routee.sayqal.uz/sms/TransmitSMS', data, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Token': accessToken 
+            }
+        })
+
+        if(response.status === 200){
+            responseData.push({
+                username: client.fio, 
+                phone: client.phone,
+                success: true
+            })
+            await pool.query(
+                `INSERT INTO reports (report, senddate, user_id, client_fio, client_phone) VALUES ($1, $2, $3, $4, $5)`,
+                [sendMessage, new Date(), req.user.id, client.fio, client.phone]
+            );
+        }
+
+        if(response.status !== 200){
+            responseData.push({
+                username: client.fio, 
+                phone: client.phone,
+                success: false
+            })
+        }
+    }
+    return res.status(200).json({
+        success: true,
+        data: responseData
+    });
+})
