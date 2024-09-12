@@ -14,7 +14,7 @@ CREATE TABLE clients(
     id BIGSERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
     phone VARCHAR(9) NOT NULL,
-    region_id INTEGER REFERENCES regions(id) NOT NULL,
+    region_id INTEGER REFERENCES regions(id) ON DELETE CASCADE,
     user_id INTEGER REFERENCES users(id) NOT NULL
 );
 
