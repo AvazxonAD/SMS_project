@@ -81,3 +81,21 @@ exports.searchByPhone = asyncHandler(async (req, res, next) => {
   })
 
 })
+
+// get elemt by id 
+exports.getElementById = asyncHandler(async (req, res, next) => {
+  let report = await pool.query(`SELECT id, report, client_fio AS username, senddate, client_phone AS phone  
+    FROM reports WHERE user_id = $1 AND id = $2
+  `, [req.user.id, req.params.id])
+  
+  report = report.rows[0]
+  if(!report){
+    return next(new ErrorResponse("Server xatolik. Xisobot topilmadi", 500))
+  }
+
+  return res.status(200).json({
+    success: true, 
+    data: report
+  })
+  
+})
